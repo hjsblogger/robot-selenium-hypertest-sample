@@ -1,368 +1,307 @@
-<img height="100" alt="hypertest_logo" src="https://user-images.githubusercontent.com/1688653/153136695-f5292c75-5d2f-4c70-aeb5-0f00a6962730.png">
+# Jenkins vs Codemagic: CI alternative for mobile developers
 
-HyperTest is a smart test orchestration platform to run end-to-end Selenium tests at the fastest speed possible. HyperTest lets you achieve an accelerated time to market by providing a test infrastructure that offers optimal speed, test orchestration, and detailed execution logs.
+So the mobile team is all focused on delivering a feature with a tight deadline, but the QA team needs the builds to test what has been implemented already. In cases like this, the need to automate the build and deployment process is needed. This can be done by setting up a Continuous Integration/Delivery (CI/CD) tool. Given that there are varieties of choices out there, it might be difficult to choose a good tool.
 
-The overall experience helps teams test code and fix issues at a much faster pace. HyperTest is configured using a YAML file. Instead of moving the Hub close to you, HyperTest brings the test scripts close to the Hub!
+Jenkins and [Codemagic](https://codemagic.io/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest) are both CI/CD tools. In this article, we will be comparing **Codemagic** with the popular continuous integration service, **Jenkins**, from the perspective of a mobile app developer. You'll also get to see what you should look out for in a CI/CD tool as a mobile developer. 
 
-* <b>HyperTest HomePage</b>: https://www.lambdatest.com/hypertest
-* <b>Lambdatest HomePage</b>: https://www.lambdatest.com
-* <b>LambdaTest Support</b>: [support@lambdatest.com](mailto:support@lambdatest.com)
+This article targets mobile developers but will be more focused on Flutter users. While it compares two CI/CD tools, it does not go in-depth on what CI/CD is. The next section discusses our contenders briefly.
 
-To know more about how HyperTest does intelligent Test Orchestration, do check out [HyperTest Getting Started Guide](https://www.lambdatest.com/support/docs/getting-started-with-hypertest/)
 
-# How to run Selenium automation tests on HyperTest (using Robot framework)
+### What is Jenkins
+[Jenkins](https://www.jenkins.io/) is an open-source continuous integration tool written in Java. It provides good flexibility for choosing tools and has a thriving [plugin library](https://plugins.jenkins.io/).
 
-* [Pre-requisites](#pre-requisites)
-   - [Download Concierge](#download-concierge)
-   - [Configure Environment Variables](#configure-environment-variables)
-   
-* [Matrix Execution with Robot](#matrix-execution-with-robot)
-   - [Core](#core)
-   - [Pre Steps and Dependency Caching](#pre-steps-and-dependency-caching)
-   - [Post Steps](#post-steps)
-   - [Artefacts Management](#artefacts-management)
-   - [Test Execution](#test-execution)
+### What is Codemagic
+[Codemagic](https://codemagic.io/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest), on the other hand, is a continuous integration and delivery service focused on mobile apps. It has support for most of the popular frameworks, like Android, iOS, Flutter, React Native, Cordova and Ionic.
 
-* [Auto-Split Execution with Robot](#auto-split-execution-with-robot)
-   - [Core](#core-1)
-   - [Pre Steps and Dependency Caching](#pre-steps-and-dependency-caching-1)
-   - [Post Steps](#post-steps-1)
-   - [Artefacts Management](#artefacts-management-1)
-   - [Test Execution](#test-execution-1)
+Comparisons between Jenkins and Codemagic will be made using eight criteria:
 
-* [Secrets Management](#secrets-management)
-* [Navigation in Automation Dashboard](#navigation-in-automation-dashboard)
+* Setup
+* Running a build
+* Speed
+* Code signing
+* Deploying artifacts
+* Maintaining infrastructure
+* Notification integration
+* Team collaboration
+* Community support
 
-# Pre-requisites
 
-Before using HyperTest, you have to download Concierge CLI corresponding to the host OS. Along with it, you also need to export the environment variables *LT_USERNAME* and *LT_ACCESS_KEY* that are available in the [LambdaTest Profile](https://accounts.lambdatest.com/detail/profile) page.
+Now that we have defined all our criteria, let’s start exploring each of them in detail and find out if Codemagic is a great alternative to Jenkins, specially for mobile app developers.
 
-## Download Concierge
+## Jenkins vs Codemagic: Setup
 
-Concierge is a CLI for interacting and running the tests on the HyperTest Grid. Concierge provides a host of other useful features that accelerate test execution. In order to trigger tests using Concierge, you need to download the Concierge binary corresponding to the platform (or OS) from where the tests are triggered:
+Let's start by discussing and comparing the setup process of both of these services.
 
-Also, it is recommended to download the binary in the project's parent directory. Shown below is the location from where you can download the Concierge binary: 
+### Jenkins: Setup
 
-* Mac: https://downloads.lambdatest.com/concierge/darwin/concierge
-* Linux: https://downloads.lambdatest.com/concierge/linux/concierge
-* Windows: https://downloads.lambdatest.com/concierge/windows/concierge.exe
+Jenkins is a self-hosted continuous integration tool, so to get started, you will first need to download it to your system.
 
-## Configure Environment Variables
+![](https://blog.codemagic.io/uploads/2021/02/jenkins_cover.png)
 
-Before the tests are run, please set the environment variables LT_USERNAME & LT_ACCESS_KEY from the terminal. The account details are available on your [LambdaTest Profile](https://accounts.lambdatest.com/detail/profile) page.
-
-For macOS:
-
-```bash
-export LT_USERNAME=LT_USERNAME
-export LT_ACCESS_KEY=LT_ACCESS_KEY
-```
-
-For Linux:
-
-```bash
-export LT_USERNAME=LT_USERNAME
-export LT_ACCESS_KEY=LT_ACCESS_KEY
-```
-
-For Windows:
-
-```bash
-set LT_USERNAME=LT_USERNAME
-set LT_ACCESS_KEY=LT_ACCESS_KEY
-```
-
-# Matrix Execution with Robot
-
-Matrix-based test execution is used for running the same tests across different test (or input) combinations. The Matrix directive in HyperTest YAML file is a *key:value* pair where value is an array of strings.
-
-Also, the *key:value* pairs are opaque strings for HyperTest. For more information about matrix multiplexing, check out the [Matrix Getting Started Guide](https://www.lambdatest.com/support/docs/getting-started-with-hypertest/#matrix-based-build-multiplexing)
-
-### Core
-
-In the current example, matrix YAML file (*yaml/robot_hypertest_matrix_sample.yaml*) in the repo contains the following configuration:
+In my case, it can be downloaded on macOS using the brew package manager:
 
 ```yaml
-globalTimeout: 90
-testSuiteTimeout: 90
-testSuiteStep: 90
+brew install jenkins-lts
 ```
 
-Global timeout, testSuite timeout, and testSuite timeout are set to 90 minutes.
- 
-The target platform is set to Windows. Please set the *[runson]* key to *[mac]* if the tests have to be executed on the macOS platform. 
+Run it as a local server:
 
 ```yaml
-runson: win
+brew services start jenkins-lts
 ```
 
-Automation tests using the Robot framework are located in the *Tests* folder (i.e. *lt_todo_app.robot* and *lt_selenium_playground.robot*). In the matrix YAML file, *files* specifies a list (or array) of *.robot* files that have to be executed on the HyperTest grid.
+After running it on your system, you can access it by going to `http://localhost:8080`.
 
-```yaml
-files: ["Tests/lt_todo_app.robot", "Tests/lt_selenium_playground.robot"]
-```
+If you are running for the first time, you have to provide the **Administrator password**.
 
-The *testSuites* object contains a list of commands (that can be presented in an array). In the example, commands for executing the tests are put in an array (with a '-' preceding each item). Execution of Robot tests is triggered using the *makefile* that is placed at the root location of the project. Since the target *OS* is set to *win*, tests to be executed on Windows 10 are triggered as a part of the *testSuites* object:
+![](https://blog.codemagic.io/uploads/2021/02/jenkins_setup_1.png)
 
-```yaml
-testSuites:
-  - make test_windows_10_edge_latest
-  - make test_windows_10_chrome_latest
-```
+Next, you will be presented with options to customize Jenkins.
 
-### Pre Steps and Dependency Caching
+![](https://blog.codemagic.io/uploads/2021/02/jenkins_setup_2.png)
 
-Dependency caching is enabled in the YAML file to ensure that the package dependencies are not downloaded in subsequent runs. The first step is to set the Key used to cache directories.
+If you go with the option "**Select plugins to install**", then you will see this page for choosing the plugins:
 
-```yaml
-cacheKey: '{{ checksum "requirements.txt" }}'
-```
+![](https://blog.codemagic.io/uploads/2021/02/jenkins_setup_3.png)
 
-Set the array of files & directories to be cached. The packages installed using *pi3* are cached in *pip_cache* directory and packages installed using *poetry install* are cached in the *poetry_cache* directory. In a nutshell, all the packages will be cached in the *pip_cache* and *poetry_cache* directories.
+Wait until the installation of the plugins completes. 
 
-```yaml
-cacheDirectories:
-  - pip_cache
-  - poetry_cache
-```
+![](https://blog.codemagic.io/uploads/2021/02/jenkins_setup_4.png)
 
-Content under the *pre* directive is the pre-condition that is triggered before the tests are executed on HyperTest grid. In the example, we have used *Poetry*  for handling dependency & packaging of the Python packages required for running the tests.
+You will then be asked to create an **Admin User**.
 
-Poetry, Robot framework (*robotframework*), and Robot Selenium library (*robotframework-seleniumlibrary*) are installed by triggering the *pip* command. All the required packages are also installed in this step using *pip3 install*. Packages mentioned in *pyprojet.toml* are installed by triggering *poetry install* as a part of the *pre* directive.
+![](https://blog.codemagic.io/uploads/2021/02/jenkins_setup_5.png)
 
-```yaml
-pre:
-  - pip3 install -r requirements.txt --cache-dir pip_cache
-  - poetry config virtualenvs.path poetry_cache
-  - poetry install
-```
+You can configure or change your Jenkins URL from this page.
 
-### Post Steps
+![](https://blog.codemagic.io/uploads/2021/02/jenkins_setup_6.png)
 
-Steps (or commands) that need to run after the test execution are listed in the *post* step. In the example, we *cat* the contents of *yaml/robot_hypertest_matrix_sample.yaml*
+After you complete the initial setup, you will see the Jenkins homepage.
 
-```yaml
-post:
-  - cat yaml/robot_hypertest_matrix_sample.yaml
-```
+![](https://blog.codemagic.io/uploads/2021/02/jenkins_setup_7.png)
 
-### Artefacts Management
+### Codemagic: Setup
 
-The *mergeArtifacts* directive (which is by default *false*) is set to *true* for merging the artefacts and combing artefacts generated under each task.
+Codemagic is a cloud-based CI/CD service, so **you don't have to install any additional tools** on your own system. The setup for Codemagic is pretty straightforward.
 
-The *uploadArtefacts* directive informs HyperTest to upload artefacts [files, reports, etc.] generated after task completion. In the example, *path* consists of a regex for parsing the directory/file (i.e. *report* that contains the test reports).
+[![Jenkins alternative for mobile app developers: you do not need to install additional tools to use Codemagic](https://blog.codemagic.io/uploads/2021/02/codemagic_setup_1.png)](https://codemagic.io/signup/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest)
 
-```yaml
-mergeArtifacts: true
+Go to Codemagic's [sign up page](https://codemagic.io/signup/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest). You can use any cloud-based Git repository (GitHub, Bitbucket, GitLab) to connect and sign up on Codemagic.
 
-uploadArtefacts:
-  [
-    {
-      "name": "report",
-      "path": ["report.html"]
-    }
-  ]
-```
+[![Codemagic sign up: choose your preferred Git repository or sign up via email](https://blog.codemagic.io/uploads/2021/02/codemagic_setup_2.png)](https://codemagic.io/signup/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest)
 
-HyperTest also facilitates the provision to download the artefacts on your local machine. To download the artefacts, click on Artefacts button corresponding to the associated TestID.
+Codemagic gives you easy access to your projects stored on your git provider. You will be taken to the dashboard after connecting to the repository.
 
-<img width="1428" alt="robot_matrix_artefacts_1" src="https://user-images.githubusercontent.com/1688653/152778296-171cd64a-1606-44cb-89bd-700a414f58ae.png">
+![Jenkins alternative for mobile app developers: Codemagic has easy and straightforward setup](https://blog.codemagic.io/uploads/2021/02/codemagic_setup_3.png)
 
-Now, you can download the artefacts by clicking on the Download button as shown below:
+You may have noticed that Codemagic's initial setup is pretty **fast and user-friendly**. If you are looking for a Jenkins alternative then Codemagic definitely takes the point when it comes to the ease of signup. 
 
-<img width="1428" alt="robot_matrix_artefacts_2" src="https://user-images.githubusercontent.com/1688653/152778325-b769c3ab-cf7e-4fa1-9ab0-9005c237fd0e.png">
+## Jenkins vs Codemagic: Running build
 
-## Test Execution
+The prerequisite for running a build on either of the services is that the project should be already committed to a cloud repository (such as GitHub).
 
-The CLI option *--config* is used for providing the custom HyperTest YAML file (i.e. *yaml/robot_hypertest_matrix_sample.yaml*). Run the following command on the terminal to trigger the tests in Python files on the HyperTest grid. The *--download-artifacts* option is used to inform HyperTest to download the artefacts for the job.
+### Jenkins: Running a build
 
-```bash
-./concierge --download-artifacts --config --verbose yaml/robot_hypertest_matrix_sample.yaml
-```
+To start a build on Jenkins, you have to create a new job. As an example, we will be building and testing a Flutter project, which is present on my GitHub account.
 
-Visit [HyperTest Automation Dashboard](https://automation.lambdatest.com/hypertest) to check the status of execution:
+First of all, you have to configure some global environment variables.
 
-<img width="1414" alt="robot_matrix_execution" src="https://user-images.githubusercontent.com/1688653/152778296-171cd64a-1606-44cb-89bd-700a414f58ae.png">
+Select **Manage Jenkins** from the left menu.
 
-Shown below is the execution screenshot when the YAML file is triggered from the terminal:
+![](https://blog.codemagic.io/uploads/2021/02/jenkins_env_1.png)
 
-<img width="1413" alt="robot_cli1_execution" src="https://user-images.githubusercontent.com/1688653/153120274-170efd8c-5b23-4ecf-a89b-e70f2b395a22.png">
+Choose **Configure System**.
 
-<img width="1101" alt="robot_cli2_execution" src="https://user-images.githubusercontent.com/1688653/152779162-344651ff-7f80-40ca-9c8a-ebd3da8d9170.png">
+![](https://blog.codemagic.io/uploads/2021/02/jenkins_env_2.png)
 
-## Auto-Split Execution with Robot
+Add some global environment variables with the path of the tools that you will need for building and testing your project on Jenkins. Click on **Save**.
 
-Auto-split execution mechanism lets you run tests at predefined concurrency and distribute the tests over the available infrastructure. Concurrency can be achieved at different levels - file, module, test suite, test, scenario, etc.
+![](https://blog.codemagic.io/uploads/2021/02/jenkins_env_3.png)
 
-For more information about auto-split execution, check out the [Auto-Split Getting Started Guide](https://www.lambdatest.com/support/docs/getting-started-with-hypertest/#smart-auto-test-splitting)
+Now, you have to configure a new job on Jenkins for your project.
 
-### Core
-
-Auto-split YAML file (*yaml/robot_hypertest_autosplit_sample.yaml*) in the repo contains the following configuration:
-
-```yaml
-globalTimeout: 90
-testSuiteTimeout: 90
-testSuiteStep: 90
-```
-
-Global timeout, testSuite timeout, and testSuite timeout are set to 90 minutes.
- 
-The *runson* key determines the platform (or operating system) on which the tests are executed. Here we have set the target OS as Windows.
-
-```yaml
-runson: win
-```
-
-Auto-split is set to true in the YAML file.
-
-```yaml
- autosplit: true
-``` 
-
-*retryOnFailure* is set to true, instructing HyperTest to retry failed command(s). The retry operation is carried out till the number of retries mentioned in *maxRetries* are exhausted or the command execution results in a *Pass*. In addition, the concurrency (i.e. number of parallel sessions) is set to 2.
-
-```yaml
-retryOnFailure: true
-maxRetries: 5
-concurrency: 2
-```
-
-### Pre Steps and Dependency Caching
-
-Dependency caching is enabled in the YAML file to ensure that the package dependencies are not downloaded in subsequent runs. The first step is to set the Key used to cache directories.
-
-```yaml
-cacheKey: '{{ checksum "requirements.txt" }}'
-```
-
-Set the array of files & directories to be cached. The packages installed using *pi3* are cached in *pip_cache* directory and packages installed using *poetry install* are cached in the *poetry_cache* directory. In a nutshell, all the packages will be cached in the *pip_cache* and *poetry_cache* directories.
-
-```yaml
-cacheDirectories:
-  - pip_cache
-  - poetry_cache
-```
-
-Content under the *pre* directive is the pre-condition that is triggered before the tests are executed on HyperTest grid. In the example, we have used *Poetry*  for handling dependency & packaging of the Python packages required for running the tests.
-
-Poetry, Robot framework (*robotframework*), and Robot Selenium library (*robotframework-seleniumlibrary*) are installed by triggering the *pip* command. All the required packages are also installed in this step using *pip3 install*. Packages mentioned in *pyprojet.toml* are installed by triggering *poetry install* as a part of the *pre* directive.
-
-```yaml
-pre:
-  - pip3 install -r requirements.txt --cache-dir pip_cache
-  - poetry config virtualenvs.path poetry_cache
-  - poetry install
-```
-
-### Post Steps
-
-Steps (or commands) that need to run after the test execution are listed in the *post* step. In the example, we *cat* the contents of *yaml/robot_hypertest_matrix_sample.yaml*
-
-```yaml
-post:
-  - cat yaml/robot_hypertest_autpsplit_sample.yaml
-```
-
-The *testDiscovery* directive contains the command that gives details of the mode of execution, along with detailing the command that is used for test execution. Here, we are fetching the list of Python files that would be further executed using the *value* passed in the *testRunnerCommand*
-
-```yaml
-testDiscovery:
-  type: raw
-  mode: dynamic
-  command: grep 'test_windows' makefile | sed 's/\(.*\):/\1 /'
+* Click on **Create a job** from the homepage.
   
-testRunnerCommand: make $test
-```
+  ![](https://blog.codemagic.io/uploads/2021/02/jenkins_job_1.png)
 
-Running the above command on the terminal will give a list of Python files that are located in the Project folder:
+* Enter a name and select **Freestyle project**. Click on **OK**.
+  
+  ![](https://blog.codemagic.io/uploads/2021/02/jenkins_job_2.png)
 
-* test_windows_10_edge_latest
-* test_windows_10_chrome_latest
+* Go to the **Source Code Management** tab, select **Git** and add your GitHub account credentials there.
+  
+  ![](https://blog.codemagic.io/uploads/2021/02/jenkins_job_3.png)
 
-The *testRunnerCommand* contains the command that is used for triggering the test. The output fetched from the *testDiscoverer* command acts as an input to the *testRunner* command.
+* Scroll down to the **Build** section, click on **Add build step** and select **Execute shell**.
+  
+  ![](https://blog.codemagic.io/uploads/2021/02/jenkins_job_4.png)
 
-```yaml
-testRunnerCommand: python3 -s $test
-```
+* Now, define a very simple build script for an Android debug build of a Flutter project:
+  
+  ![](https://blog.codemagic.io/uploads/2021/02/jenkins_job_5.png)
 
-### Artefacts Management
+You can navigate to the **Console Output** section from the left menu to see the progress.
 
-The *mergeArtifacts* directive (which is by default *false*) is set to *true* for merging the artefacts and combing artefacts generated under each task.
+![](https://blog.codemagic.io/uploads/2021/02/jenkins_job_6.png)
 
-The *uploadArtefacts* directive informs HyperTest to upload artefacts [files, reports, etc.] generated after task completion. In the example, *path* consists of a regex for parsing the directory/file (i.e. *report* that contains the test reports).
+When the build completes, you will see this on your **Dashboard**:
 
-```yaml
-mergeArtifacts: true
+![](https://blog.codemagic.io/uploads/2021/02/jenkins_job_7.png)
 
-uploadArtefacts:
-  [
-    {
-      "name": "report",
-      "path": ["report.html"]
-    }
-  ]
-```
+### Codemagic: Running a build
 
-HyperTest also facilitates the provision to download the artefacts on your local machine. To download the artefacts, click on *Artefacts* button corresponding to the associated TestID.
+Running builds on Codemagic is much simpler, as it provides a much better UI, and you do not need to connect to your Git repository manually. As you have seen during the setup, Codemagic has already connected to the Git repository.
 
-<img width="1415" alt="robot_autosplit_artefacts_1" src="https://user-images.githubusercontent.com/1688653/152783525-8fb709cc-63d8-4888-b513-4fac37404604.png">
+* To configure a project for building, click on the **Add application** button on the **Applications dashboard**. Click on **Set up build**.
+  
+  ![](media/codemagic_applications_overview.png)
 
-Now, you can download the artefacts by clicking on the *Download* button as shown below:
+* Connect your repository by selecting your Git provider — in this case GitHub.
+  
+  ![](media/codemagic_connect_repository.png)
 
-<img width="1422" alt="robot_autosplit_artefacts_2" src="https://user-images.githubusercontent.com/1688653/152780924-058e83bd-7e9e-4bc9-a52d-834c78760af9.png">
+* Select the repository name from the dropdown, then select project type — in this case, Flutter App, then click on the **Finish: Add application** button.
 
-### Test Execution
+  ![](media/codemagic_setup_application.png)
+* You can configure your build pipeline from this page. Then, just click on **Start your first build**.
+  
+  ![](media/codemagic_application_home.png)
+  > Notice how Codemagic gives you the option to select which Flutter build platforms to build for.
 
-The CLI option *--config* is used for providing the custom HyperTest YAML file (i.e. *yaml/robot_hypertest_autosplit_sample.yaml*). Run the following command on the terminal to trigger the tests in Python files on the HyperTest grid. The *--download-artifacts* option is used to inform HyperTest to download the artefacts for the job.
+* You can choose to build from a git **branch** or git **tag**. If there are multiple workflows for the project, you can select from the **Select workflow** dropdown. Then click on **Start new build**.
+  > Git tags are a specific reference to a point in git history. Unlike branches that get updated, git tags are permanent. These tags are useful for software versioning.
 
-```bash
-./concierge --download-artifacts --verbose --config yaml/robot_hypertest_autosplit_sample.yaml
-```
+  ![](media/codemagic_specify_build_configuration.png)
 
-Visit [HyperTest Automation Dashboard](https://automation.lambdatest.com/hypertest) to check the status of execution
+This will start the build on Codemagic. Wait for it to complete.
 
-<img width="1414" alt="robot_autosplit_execution" src="https://user-images.githubusercontent.com/1688653/152783525-8fb709cc-63d8-4888-b513-4fac37404604.png">
+![](media/codemagic_completion.png)
 
-Shown below is the execution screenshot when the YAML file is triggered from the terminal:
 
-<img width="1422" alt="robot_autosplit_cli1_execution" src="https://user-images.githubusercontent.com/1688653/152782594-fc4ed050-f425-403c-b8d6-f8894d66ab93.png">
+You can also see your previous and currently running builds on the **Builds overview** page:
 
-<img width="1406" alt="robot_autosplit_cli2_execution" src="https://user-images.githubusercontent.com/1688653/152783131-f1b8ef7a-48ce-447b-ba48-320bdc43656e.png">
+![](media/codemagic_build_overview.png)
+  > Note how you can filter builds based on different parameters. 
 
-## Secrets Management
+Codemagic offers a default workflow for Flutter build pipelines. To set up other project-type workflows (Android, React Native, etc.), you have to use the [codemagic.yaml](https://docs.codemagic.io/getting-started/yaml/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest) file.
 
-In case you want to use any secret keys in the YAML file, the same can be set by clicking on the *Secrets* button the dashboard.
+## Jenkins vs Codemagic: Build speed
+The build speed is another essential metric to compare. Although build speed mostly depends on the type of application being built, the computer building the app plays a major role. 
 
-<img width="703" alt="robot_secrets_key_1" src="https://user-images.githubusercontent.com/1688653/152540968-90e4e8bc-3eb4-4259-856b-5e513cbd19b5.png">
+### Jenkins: Build speed
+Since Jenkins is locally installed, build speed depends on the host computers.
 
-Now create a *secret* key that you can use in the HyperTest YAML file.
+### Codemagic: Build speed
+Codemagic build speed is fast. Codemagic provides the M1 macOS machine instance, by default.
+  ![](media/codemagic_default_machine.png)
+> By enabling billing, you can access more build machine types. 
+## Jenkins vs Codemagic: Code signing and Deployment
 
-<img width="359" alt="secrets_management_1" src="https://user-images.githubusercontent.com/1688653/153250877-e58445d1-2735-409a-970d-14253991c69e.png">
+Code signing is an important stage of a mobile app development workflow that is required if you want to release your app to the public by publishing it to the Google Play Store or Apple App Store.
 
-All you need to do is create an environment variable that uses the secret key:
+Deploying build artifacts to Google Play Store or Apple App Store is a cumbersome process, so using a continuous integration service to manage and handle this process is recommended.
 
-```yaml
-env:
-  PAT: ${{ .secrets.testKey }}
-```
 
-## Navigation in Automation Dashboard
+### Jenkins: Code signing and Deployment
 
-HyperTest lets you navigate from/to *Test Logs* in Automation Dashboard from/to *HyperTest Logs*. You also get relevant get relevant Selenium test details like video, network log, commands, Exceptions & more in the Dashboard. Effortlessly navigate from the automation dashboard to HyperTest logs (and vice-versa) to get more details of the test execution.
+There are Jenkins plugins available for code signing your build artifacts for both the Android and iOS platforms.
 
-Shown below is the HyperTest Automation dashboard which also lists the tests that were executed as a part of the test suite:
+To code sign your Android builds, you can use the [Android Signing plugin](https://www.jenkins.io/doc/pipeline/steps/android-signing/), and for iOS builds, you can use the [Xcode plugin](https://plugins.jenkins.io/xcode-plugin/).
 
-<img width="1238" alt="robot_hypertest_automation_dashboard" src="https://user-images.githubusercontent.com/1688653/152783525-8fb709cc-63d8-4888-b513-4fac37404604.png">
 
-Here is a screenshot that lists the automation test that was executed on the HyperTest grid:
+Jenkins plugins are available for deploying your build artifacts. Android artifacts can be deployed to Google Play Store using the plugin [Google Play Android Publisher](https://plugins.jenkins.io/google-play-android-publisher/). For iOS artifacts, the same [Xcode plugin](https://plugins.jenkins.io/xcode-plugin/) that can be used for code signing can also be used for deploying to Apple App Store.
 
-<img width="1423" alt="robot_testing_automation_dashboard" src="https://user-images.githubusercontent.com/1688653/152784306-749c5d8c-b72c-40e9-a707-5374cc530430.png">
+You can also use third-party services, like App Center, to publish your build artifacts. The [App Center plugin](https://plugins.jenkins.io/appcenter/) is available for Jenkins.
 
-## We are here to help you :)
-* LambdaTest Support: [support@lambdatest.com](mailto:support@lambdatest.com)
-* Lambdatest HomePage: https://www.lambdatest.com
-* HyperTest HomePage: https://www.lambdatest.com/support/docs/getting-started-with-hypertest/
+### Codemagic: Code signing and Deployment
 
-## License
-Licensed under the [MIT license](LICENSE).
+Codemagic provides a developer-friendly code-signing process that can be configured from the project settings UI or by using the `codemagic.yaml` file.
+
+
+Codemagic also provides integration with the **Apple Developer Portal** for even easier iOS code signing.
+
+> For more information, check out the code-signing docs for [Android](https://docs.codemagic.io/code-signing-yaml/signing-android/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest) and [iOS](https://docs.codemagic.io/code-signing-yaml/signing-ios/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest).
+
+
+On your project settings page, you can scroll down to the **Distribution** section, where you will find options to sign-up and publish your artifacts using different services. Codemagic has support for directly publishing to Google Play Store and App Store Connect.
+
+![](media/codemagic_code_signin.png)
+
+> For more information on publishing your build artifacts, check out the [documentation](https://docs.codemagic.io/publishing-yaml/distribution/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest).
+
+
+## Jenkins vs Codemagic: Maintaining infrastructure
+
+Infrastructural management cost is an important decision-making factor to consider while you are choosing a continuous integration service.
+
+### Jenkins: Maintaining infrastructure
+
+All Jenkins builds run on **self-hosted** servers, which adds the overhead of having to manage users on your own infrastructure and keeping all the development tools updated. It can be integrated with third-party cloud-based servers where the tools can be maintained, but this requires additional configuration, which might be intimidating for someone who is just getting started with CI for their project and might require a DevOps person to be on the team.
+
+### Codemagic: Maintaining infrastructure
+
+The builds on Codemagic run on their **cloud-based** servers, which are completely managed by the experienced Codemagic team. This helps in keeping all the build tools updated so that users can focus on their app development process without having any infrastructural management overhead. Codemagic build systems are [pre-installed](https://docs.codemagic.io/specs/versions/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest#pre-installed-tools) with all the tools required for a common mobile app development workflow.
+
+## Jenkins vs Codemagic: Notification integration
+
+Notifications are necessary to keep your team updated on the build status while they focus on the development of the app.
+
+### Jenkins: Notification integration
+
+Jenkins provides several plugins for enabling build notifications through email, Slack, Telegram, and many other platforms. But all of them require additional configuration to enable them for a project.
+
+### Codemagic: Notification integration
+
+Email notifications on the build status and the generated artifacts are enabled by default on Codemagic. Apart from that, Codemagic provides integration with various third-party services, like Slack, MS Teams, and many others.
+
+> Learn more about the steps for enabling them [here](https://docs.codemagic.io/publishing/email-and-slack-notifications/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest).
+
+## Jenkins vs Codemagic: Team collaboration
+
+Any continuous integration and deployment workflow can be made more successful with a proper team collaboration setup, as critical bugs get attention and are fixed faster.
+
+### Jenkins: Team collaboration
+
+Jenkins doesn't provide any tools for building a good team collaboration in a workflow. It has to be organized and managed by the development team.
+
+### Codemagic: Team collaboration
+
+In Codemagic, you can have a [Team](https://docs.codemagic.io/teams/teams/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest) account, which makes it easy to maintain a good development workflow when more than one developer is working on a project.
+
+On top of that, Codemagic provides a nice feature called [public dashboards](https://docs.codemagic.io/publishing-yaml/public-dashboards/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest) that makes it possible for teams to share the list of builds, release notes and build artifacts with people outside Codemagic using a public link.
+
+## Jenkins vs Codemagic: Community support
+
+Another aspect to take into consideration before choosing a continuous integration service is the community support and the quality of the documentation built around the service.
+
+### Jenkins: Community support
+
+Jenkins, being one of the oldest and most popular continuous integration services, has a huge community base. They help in keeping the [documentation](https://www.jenkins.io/doc/) updated and maintaining its enormous number of plugins to keep them functional.
+
+### Codemagic: Community support
+
+Codemagic provides awesome community support through their **Slack Workspace**, which is accessible to the public. Here, developers can ask about any issue they face while using Codemagic and can even suggest feature improvements directly to the Codemagic team.
+
+Codemagic has very detailed open-source [documentation](https://docs.codemagic.io/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest). As it is open source, anyone from the community can suggest any improvement to it or can contribute by sending a pull request to the [GitHub repository](https://github.com/codemagic-ci-cd/codemagic-docs).
+
+Codemagic also maintains a [blog](https://blog.codemagic.io/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest), which not only has articles related to its CI service but also about various features and implementations of the frameworks, their testing support and many other topics.
+
+> Join the Codemagic Slack workspace [here](https://slack.codemagic.io/).
+
+## Jenkins vs Codemagic: Conclusion
+
+Choosing and building a proper continuous integration and delivery workflow for the team might be difficult, but this article should have simplified it a bit so that you can choose a CI/CD solution best suited for your workflow. 
+
+**Jenkins** is open-sourced and free of cost as it is a self-hosted service, but this increases the overhead of maintaining the infrastructure and keeping the entire set of tools updated. There is an enormous range of plugins available for integrating various tools and services with the workflow.
+
+**[Codemagic](https://codemagic.io/start/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest)** is a cloud-based solution (no overhead of maintaining any infrastructure) with pre-installed tools suited for a mobile app development workflow. In addition, it provides easy code-signing and deployment of apps to major services. It also allows numerous third-party [integrations](https://codemagic.io/integrations/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest) that help you to make the workflow more productive with the tools that you love.
+
+In a nutshell, if you are setting up a CI/CD workflow focused on mobile apps, then **Codemagic** (having support for all major app development frameworks and tools) should be a better choice over Jenkins. On the other hand, if you want better flexibility and your workflow consists of testing other backend frameworks as well (in addition to app development), then Jenkins might be a better choice for you.
+
+### References
+
+* [Codemagic docs](https://docs.codemagic.io/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest)
+* [Jenkins docs](https://www.jenkins.io/doc/)
+* [Getting started with Codemagic](https://blog.codemagic.io/getting-started-with-codemagic/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest)
+* [Codemagic integrations](https://codemagic.io/integrations/?utm_source=referral&utm_medium=lambdatest_jenkins_article&utm_campaign=lambdatest)
+
